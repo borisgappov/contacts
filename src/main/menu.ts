@@ -6,7 +6,6 @@ import {
   MenuItemConstructorOptions,
 } from 'electron';
 
-
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;

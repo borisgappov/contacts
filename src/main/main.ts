@@ -12,7 +12,7 @@ import DataSource from './data-source';
 const store = new Store();
 
 ipcMain.on('electron-store-get', async (event, key) => {
-  switch(key) {
+  switch (key) {
     case 'contacts':
       event.returnValue = [1, 2, 3, 4, 5];
       break;
@@ -27,7 +27,6 @@ ipcMain.on('electron-store-get', async (event, key) => {
 ipcMain.on('electron-store-set', async (event, key, val) => {
   store.set(key, val);
 });
-
 
 export default class AppUpdater {
   constructor() {
