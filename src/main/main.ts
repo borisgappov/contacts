@@ -25,7 +25,14 @@ ipcMain.on('electron-store-get', async (event, key) => {
 });
 
 ipcMain.on('electron-store-set', async (event, key, val) => {
-  store.set(key, val);
+  switch (key) {
+    case 'quit':
+      app.quit();
+      break;
+    default:
+      break;
+  }
+  // store.set(key, val);
 });
 
 export default class AppUpdater {
