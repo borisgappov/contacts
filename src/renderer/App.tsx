@@ -1,23 +1,27 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
 import 'devextreme/dist/css/dx.light.css';
-import { Button } from 'devextreme-react';
-import InitialPopup from './InitialPopup';
+import { useState } from 'react';
+import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
+import './App.css';
+import WelcomePopup from './WelcomePopup';
 
 const Hello = () => {
-  const sayHelloWorld = () => {
-    const res = window.electron.store.get('isInitialized');
-    console.log(res);
-    // window.electron.store.set('abc', 33);
-    // const res = window.electron.store.get('abc');
-    // console.log(res);
+  const [initialized, setInitialized] = useState(
+    window.electron.store.get('isInitialized')
+  );
+
+  const create = (password: string) => {
+    console.log(password);
+    setInitialized(true);
+  };
+
+  const exit = () => {
+    setInitialized(true);
   };
 
   return (
-    <div>
-      <InitialPopup />
-      {/* <Button text="Click me" onClick={sayHelloWorld} /> */}
-    </div>
+    <>
+      <WelcomePopup visible={!initialized} create={create} exit={exit} />
+    </>
   );
 };
 
