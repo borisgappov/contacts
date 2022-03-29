@@ -62,8 +62,21 @@ typings/
 # Optional REPL history
 .node_repl_history
 
+# OSX
+.DS_Store
+
 # Output of 'npm pack'
 *.tgz
+
+release/app/dist
+release/build
+.erb/dll
+
+.idea
+npm-debug.log.*
+*.css.d.ts
+*.sass.d.ts
+*.scss.d.ts
 
 # Yarn Integrity file
 .yarn-integrity
