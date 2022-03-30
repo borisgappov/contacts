@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electron', {
     get(val: string) {
       return ipcRenderer.sendSync('electron-store-get', val);
     },
+    // eslint-disable-next-line
     set(key: string, val: any) {
       ipcRenderer.send('electron-store-set', key, val);
     },

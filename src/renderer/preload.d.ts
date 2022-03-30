@@ -2,7 +2,9 @@ declare global {
   interface Window {
     electron: {
       store: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         get: (key: string) => any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         set: (key: string, val: any) => void;
       };
       ipcRenderer: {

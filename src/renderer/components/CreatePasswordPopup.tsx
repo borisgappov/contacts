@@ -1,6 +1,11 @@
 import { Form, Popup } from 'devextreme-react';
 import { ToolbarItem } from 'devextreme-react/autocomplete';
-import { CompareRule, Label, RequiredRule, SimpleItem } from 'devextreme-react/form';
+import {
+  CompareRule,
+  Label,
+  RequiredRule,
+  SimpleItem,
+} from 'devextreme-react/form';
 import { Position } from 'devextreme-react/popup';
 import { InitializedEvent } from 'devextreme/ui/form';
 
@@ -11,23 +16,25 @@ export default function CreatePasswordPopup(props: {
 }) {
   const model = {
     password: '',
-    confirm: ''
+    confirm: '',
   };
 
   const { visible, create, exit } = props;
 
+  // eslint-disable-next-line
   let formInstance: any;
 
   const initFormEvent = (e: InitializedEvent) => {
     formInstance = e.component?.instance();
-  }
+  };
 
   const createPasswordClick = () => {
     if (formInstance.validate().isValid) {
-      create(model.password);
+      const { password } = { ...model };
       formInstance.resetValues();
+      create(password);
     }
-  }
+  };
 
   return (
     <Popup
@@ -42,18 +49,38 @@ export default function CreatePasswordPopup(props: {
     >
       <Position at="center" my="center" of={window} />
       <p>
-        The data will be encrypted using this password. Please do not forget it, as it is not stored anywhere and if it
-        is lost, the data will be impossible to recover.
+        The data will be encrypted using this password. Please do not forget it,
+        as it is not stored anywhere and if it is lost, the data will be
+        impossible to recover.
       </p>
       <form action="your-action">
-        <Form formData={model} readOnly={false} validationGroup="passwordData" colCount={2} onInitialized={initFormEvent}>
-          <SimpleItem editorType="dxTextBox" dataField="password" colSpan={2} editorOptions={{ mode: 'password' }}>
+        <Form
+          formData={model}
+          readOnly={false}
+          validationGroup="passwordData"
+          colCount={2}
+          onInitialized={initFormEvent}
+        >
+          <SimpleItem
+            editorType="dxTextBox"
+            dataField="password"
+            colSpan={2}
+            editorOptions={{ mode: 'password' }}
+          >
             <RequiredRule message="Password is required" />
           </SimpleItem>
-          <SimpleItem editorType="dxTextBox" dataField="confirm" colSpan={2} editorOptions={{ mode: 'password' }}>
+          <SimpleItem
+            editorType="dxTextBox"
+            dataField="confirm"
+            colSpan={2}
+            editorOptions={{ mode: 'password' }}
+          >
             <Label text="Confirm Password" />
             <RequiredRule message="Confirm Password is required" />
-            <CompareRule message="Password and Confirm Password do not match" comparisonTarget={() => model.password} />
+            <CompareRule
+              message="Password and Confirm Password do not match"
+              comparisonTarget={() => model.password}
+            />
           </SimpleItem>
         </Form>
       </form>
@@ -75,7 +102,7 @@ export default function CreatePasswordPopup(props: {
           text: 'Create password',
           type: 'success',
           validationGroup: 'passwordData',
-          onClick: () => createPasswordClick()
+          onClick: () => createPasswordClick(),
         }}
       />
     </Popup>

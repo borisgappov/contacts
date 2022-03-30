@@ -1,31 +1,36 @@
 import 'devextreme/dist/css/dx.light.css';
-import { useState } from 'react';
-import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
-import './App.css';
-import CreatePasswordPopup from './CreatePasswordPopup';
+import { Provider, useSelector } from 'react-redux';
+import {
+  MemoryRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+} from 'react-router-dom';
+import Contacts from './components/Contacts';
+import Home from './components/Home';
+import { selectAuthenticated } from './store/contactsSlice';
+import store from './store/store';
+import './styles.css';
 
-const Home = () => {
-  const [initialized, setInitialized] = useState(
-    window.electron.store.get('isInitialized')
-  );
-
-  const create = (password: string) => {
-    setInitialized(true);
-  };
-
-  const exit = () => window.electron.store.set('quit', null);
-
-  return (
-    <CreatePasswordPopup visible={!initialized} create={create} exit={exit} />
-  );
-};
-
-export default function App() {
+function AppRouter() {
+  const authenticated = useSelector(selectAuthenticated);
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route
+          path="/contacts"
+          element={authenticated ? <Contacts /> : <Navigate to="/" />}
+        />
       </Routes>
     </Router>
+  );
+}
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <AppRouter />
+    </Provider>
   );
 }

@@ -4,12 +4,10 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import Store from 'electron-store';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import DataSource from './data-source';
-
-const store = new Store();
+import sampleData from './sample-data.json';
 
 ipcMain.on('electron-store-get', async (event, key) => {
   switch (key) {
@@ -19,11 +17,15 @@ ipcMain.on('electron-store-get', async (event, key) => {
     case 'isInitialized':
       event.returnValue = DataSource.dataFileExist();
       break;
+    case 'sampleData':
+      event.returnValue = sampleData;
+      break;
     default:
       event.returnValue = null;
   }
 });
 
+// eslint-disable-next-line
 ipcMain.on('electron-store-set', async (event, key, val) => {
   switch (key) {
     case 'quit':
@@ -32,7 +34,6 @@ ipcMain.on('electron-store-set', async (event, key, val) => {
     default:
       break;
   }
-  // store.set(key, val);
 });
 
 export default class AppUpdater {
@@ -66,7 +67,7 @@ if (isDevelopment) {
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS'];
+  const extensions = ['REDUX_DEVTOOLS', 'REACT_DEVELOPER_TOOLS'];
 
   return installer
     .default(
