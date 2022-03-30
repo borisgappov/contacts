@@ -11,21 +11,22 @@ export const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
   reducers: {
-    append: (state, action) => {
-      state.items = [...state.items, action.payload];
-    },
     set: (state, action) => {
       state.items = action.payload;
     },
-    remove: (state, action) => {
-      state.items = [...state.items.filter((e) => e.id !== action.payload.id)];
+    append: (state, action) => {
+      state.items = [...state.items, action.payload];
     },
     update: (state, action) => {
-      const item = action.payload;
-      const changed = state.items.find((e) => e.id === item.id);
-      if (changed) {
-        Object.assign(changed, item);
+      const items = [...state.items];
+      const index = items.findIndex((e) => e.id === action.payload.id);
+      if (index >= 0) {
+        items[index] = { ...action.payload };
+        state.items = items;
       }
+    },
+    remove: (state, action) => {
+      state.items = [...state.items.filter((e) => e.id !== action.payload.id)];
     },
     setInitialized: (state, action) => {
       state.initialized = action.payload;

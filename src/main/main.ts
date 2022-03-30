@@ -18,7 +18,7 @@ ipcMain.on('electron-store-get', async (event, key) => {
       event.returnValue = DataSource.dataFileExist();
       break;
     case 'sampleData':
-      event.returnValue = sampleData;
+      event.returnValue = sampleData.filter((e, i) => i < 15);
       break;
     default:
       event.returnValue = null;
