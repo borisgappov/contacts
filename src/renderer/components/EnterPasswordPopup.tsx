@@ -6,9 +6,8 @@ import { Position } from 'devextreme-react/popup';
 import { CustomRule } from 'devextreme-react/validator';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import Utils from 'renderer/shared/utils';
-import { set, setAuthenticated } from 'renderer/store/contactsSlice';
+import { set, setHash } from 'renderer/store/contactsSlice';
 import styled from 'styled-components';
 import Brand from './Brand';
 
@@ -19,24 +18,22 @@ const BrandContainer = styled.div`
 
 export default function EnterPasswordPopup() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const passwordRequirements = Utils.getPasswordRequirements();
   const model = { password: '1qaz@WSXZx' };
   const [passwordValid, setPasswordValid] = useState(true);
-  const formInstance = useRef(null as any);
+  const formInstance: React.RefObject<Form> = useRef(null);
 
   const enterPasswordClick = () => {
-    if (formInstance.current.instance.validate().isValid) {
+    if (formInstance.current?.instance.validate().isValid) {
       const data = window.electron.store.get('loadData').toString();
-      const contacts = Utils.decrypt(data, model.password);
+      const hash = Utils.getHash(model.password);
+      const contacts = Utils.decrypt(data, hash);
       if (contacts) {
         formInstance.current.instance.resetValues();
         dispatch(set(contacts));
-        dispatch(setAuthenticated(true));
-        setTimeout(() => navigate('contacts'));
+        dispatch(setHash(hash));
       } else {
         setPasswordValid(false);
-        setTimeout(() => setPasswordValid(true), 1500);
       }
     }
   };
@@ -49,7 +46,7 @@ export default function EnterPasswordPopup() {
       closeOnOutsideClick={false}
       showCloseButton={false}
       width={400}
-      height={340}
+      height={230}
     >
       <Position at="center" my="center" of={window} />
       <BrandContainer>

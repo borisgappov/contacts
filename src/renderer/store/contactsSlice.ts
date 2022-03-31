@@ -5,6 +5,7 @@ const initialState: IContactsState = {
   items: [],
   initialized: false,
   authenticated: false,
+  hash: '',
 };
 
 export const contactsSlice = createSlice({
@@ -31,13 +32,14 @@ export const contactsSlice = createSlice({
     setInitialized: (state, action) => {
       state.initialized = action.payload;
     },
-    setAuthenticated: (state, action) => {
-      state.authenticated = action.payload;
+    setHash: (state, action) => {
+      state.hash = action.payload;
+      state.authenticated = !!state.hash;
     },
   },
 });
 
-export const { append, remove, set, update, setInitialized, setAuthenticated } =
+export const { append, remove, set, update, setInitialized, setHash } =
   contactsSlice.actions;
 
 export const selectItems = (state: { contacts: IContactsState }) =>
@@ -48,5 +50,8 @@ export const selectAuthenticated = (state: { contacts: IContactsState }) =>
 
 export const selectInitialized = (state: { contacts: IContactsState }) =>
   state.contacts.initialized;
+
+export const selectHash = (state: { contacts: IContactsState }) =>
+  state.contacts.hash;
 
 export default contactsSlice.reducer;

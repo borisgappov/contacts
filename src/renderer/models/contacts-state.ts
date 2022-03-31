@@ -4,4 +4,5 @@ export interface IContactsState {
   items: IContact[];
   initialized: boolean;
   authenticated: boolean;
+  hash: string;
 }

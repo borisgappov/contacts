@@ -1,30 +1,55 @@
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  faArrowRightFromBracket,
+  faFileImport,
+  faXmarkCircle,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button } from 'devextreme-react';
 import DataGrid, {
   Column,
-  FilterRow,
-  HeaderFilter,
-  FilterPanel,
-  FilterBuilderPopup,
-  Scrolling,
-  Editing,
-  Popup,
-  Form,
   ColumnChooser,
-  Toolbar,
+  Editing,
+  FilterBuilderPopup,
+  FilterPanel,
+  FilterRow,
+  Form,
+  HeaderFilter,
+  Popup,
+  Scrolling,
   SearchPanel,
+  Toolbar,
 } from 'devextreme-react/data-grid';
 import { Item } from 'devextreme-react/form';
-import DataSource from 'devextreme/data/data_source';
 import ArrayStore from 'devextreme/data/array_store';
-import { IContact } from 'renderer/models/contact';
-import { Options } from 'devextreme-react/autocomplete';
-import { append, update, remove, selectItems } from '../store/contactsSlice';
+import DataSource from 'devextreme/data/data_source';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Utils from 'renderer/shared/utils';
+import styled from 'styled-components';
+import {
+  append,
+  remove,
+  selectHash,
+  selectItems,
+  setHash,
+  update,
+} from '../store/contactsSlice';
 import Brand from './Brand';
+
+const FaIcon = styled(FontAwesomeIcon)`
+  font-size: 18px;
+`;
 
 export default function Contacts() {
   const items = useSelector(selectItems);
-
+  const hash = useSelector(selectHash);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (hash) window.electron.store.set('saveData', Utils.encrypt(items, hash));
+  }, [hash, items]);
 
   const dataSource = new DataSource({
     store: new ArrayStore({
@@ -33,36 +58,17 @@ export default function Contacts() {
           return { ...e };
         }),
       ],
-      onInserted: (values, key) => {
-        const lastItem = items.reduce(
-          (p: IContact, c: IContact) => (p.id > c.id ? p : c),
-          {} as IContact
-        );
-        values.id = lastItem ? lastItem.id + 1 : 1;
-        dispatch(append(values));
-      },
-      onUpdated: (key, values) => {
-        dispatch(update(values));
-        console.log('store, updated', key, values);
-      },
-      onRemoved: (key) => {
-        dispatch(remove(key));
-        console.log('store, removed', key);
-      },
-      onLoaded: (result) => {
-        console.log('store, loaded', result);
-      },
-      onModified: () => {
-        console.log('store, modifyed', dataSource.store());
-      },
+      onInserted: (e) => dispatch(append({ ...e, id: Utils.getNextId(items) })),
+      onUpdated: (e) => dispatch(update(e)),
+      onRemoved: (e) => dispatch(remove(e)),
     }),
     key: 'id',
   });
 
   return (
     <DataGrid
+      visible
       dataSource={dataSource}
-      keyExpr="id"
       showBorders
       columnHidingEnabled
       columnAutoWidth
@@ -104,27 +110,33 @@ export default function Contacts() {
         />
         <Item location="after" name="searchPanel" locateInMenu="auto" />
         <Item location="after" name="columnChooserButton" locateInMenu="auto" />
-        {/* <Item name="separator" /> */}
-        <Item
-          location="after"
-          showText="inMenu"
-          widget="dxButton"
-          locateInMenu="auto"
-        >
-          <Options
-            icon="import"
+        <Item location="after">
+          <Button
+            width={36}
+            height={36}
             hint="Import sample data"
-            text="Import sample data"
-          />
-          {/* <Button icon="import" hint="Import sample data" text="Import sample data" /> */}
+            onClick={() => {}}
+          >
+            <FaIcon icon={faFileImport} />
+          </Button>
         </Item>
-        <Item
-          location="after"
-          showText="inMenu"
-          widget="dxButton"
-          locateInMenu="auto"
-        >
-          <Options icon="clear" hint="Clear" text="Clear" />
+        <Item location="after">
+          <Button width={36} height={36} hint="Clear data" onClick={() => {}}>
+            <FaIcon icon={faXmarkCircle} />
+          </Button>
+        </Item>
+        <Item location="after">
+          <Button
+            width={36}
+            height={36}
+            hint="Log Out"
+            onClick={() => {
+              dispatch(setHash(''));
+              navigate('/');
+            }}
+          >
+            <FaIcon icon={faArrowRightFromBracket} />
+          </Button>
         </Item>
       </Toolbar>
     </DataGrid>

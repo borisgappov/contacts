@@ -5,9 +5,7 @@ import * as fs from 'fs-extra';
 export default class DataSource {
   private static dataFileName = 'rdxworks_contacts.data';
 
-  // private static fileName = () => join(app.getPath('temp'), this.dataFileName);
   private static fileName = () => {
-    console.log(join(app.getAppPath(), this.dataFileName));
     return join(app.getAppPath(), this.dataFileName);
   };
 

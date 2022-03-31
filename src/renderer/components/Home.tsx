@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 import {
   selectAuthenticated,
   selectInitialized,
@@ -10,13 +11,8 @@ export default function Home() {
   const initialized = useSelector(selectInitialized);
   const authenticated = useSelector(selectAuthenticated);
 
-  return (
-    <>
-      {initialized ? (
-        !authenticated && <EnterPasswordPopup />
-      ) : (
-        <CreatePasswordPopup />
-      )}
-    </>
-  );
+  if (initialized) {
+    return authenticated ? <Navigate to="/contacts" /> : <EnterPasswordPopup />;
+  }
+  return <CreatePasswordPopup />;
 }

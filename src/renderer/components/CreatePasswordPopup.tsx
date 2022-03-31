@@ -10,13 +10,8 @@ import {
 import { Position } from 'devextreme-react/popup';
 import { useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import Utils from 'renderer/shared/utils';
-import {
-  set,
-  setAuthenticated,
-  setInitialized,
-} from 'renderer/store/contactsSlice';
+import { set, setHash, setInitialized } from 'renderer/store/contactsSlice';
 import styled from 'styled-components';
 import Brand from './Brand';
 
@@ -27,19 +22,19 @@ const BrandContainer = styled.div`
 
 export default function CreatePasswordPopup() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const passwordRequirements = Utils.getPasswordRequirements();
   const model = { password: '1qaz@WSXZx', confirm: '1qaz@WSXZx' };
-  const formInstance = useRef(null as any);
+  const formInstance: React.RefObject<Form> = useRef(null);
 
   const createPasswordClick = () => {
-    if (formInstance.current.instance.validate().isValid) {
+    if (formInstance.current?.instance.validate().isValid) {
+      const items = Utils.getSampleData();
+      const hash = Utils.getHash(model.password);
       formInstance.current.instance.resetValues();
+      dispatch(set(items));
       dispatch(setInitialized(true));
-      const sampleData = Utils.getSampleData();
-      dispatch(set(sampleData));
-      dispatch(setAuthenticated(true));
-      navigate('contacts');
+      dispatch(setHash(hash));
+      window.electron.store.set('saveData', Utils.encrypt(items, hash));
     }
   };
 
