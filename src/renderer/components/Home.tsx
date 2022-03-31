@@ -1,34 +1,22 @@
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
+  selectAuthenticated,
   selectInitialized,
-  set,
-  setAuthenticated,
-  setInitialized,
 } from 'renderer/store/contactsSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import getSampleData from 'renderer/shared/utils';
 import CreatePasswordPopup from './CreatePasswordPopup';
+import EnterPasswordPopup from './EnterPasswordPopup';
 
 export default function Home() {
-  const navigate = useNavigate();
-
   const initialized = useSelector(selectInitialized);
-  const dispatch = useDispatch();
-
-  // eslint-disable-next-line
-  const create = (password: string) => {
-    dispatch(setInitialized(true));
-    dispatch(set(getSampleData()));
-    dispatch(setAuthenticated(true));
-    setTimeout(() => navigate('contacts'));
-  };
-
-  const exit = () => window.electron.store.set('quit', null);
+  const authenticated = useSelector(selectAuthenticated);
 
   return (
     <>
-      Home component
-      <CreatePasswordPopup visible={!initialized} create={create} exit={exit} />
+      {initialized ? (
+        !authenticated && <EnterPasswordPopup />
+      ) : (
+        <CreatePasswordPopup />
+      )}
     </>
   );
 }

@@ -1,22 +1,14 @@
 import { Form, Popup } from 'devextreme-react';
 import { ToolbarItem } from 'devextreme-react/autocomplete';
 import { PatternRule } from 'devextreme-react/data-grid';
-import {
-  CompareRule,
-  Label,
-  RequiredRule,
-  SimpleItem,
-} from 'devextreme-react/form';
+import { RequiredRule, SimpleItem } from 'devextreme-react/form';
 import { Position } from 'devextreme-react/popup';
-import { useRef } from 'react';
+import { CustomRule } from 'devextreme-react/validator';
+import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Utils from 'renderer/shared/utils';
-import {
-  set,
-  setAuthenticated,
-  setInitialized,
-} from 'renderer/store/contactsSlice';
+import { set, setAuthenticated } from 'renderer/store/contactsSlice';
 import styled from 'styled-components';
 import Brand from './Brand';
 
@@ -25,21 +17,27 @@ const BrandContainer = styled.div`
   justify-content: center;
 `;
 
-export default function CreatePasswordPopup() {
+export default function EnterPasswordPopup() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const passwordRequirements = Utils.getPasswordRequirements();
-  const model = { password: '1qaz@WSXZx', confirm: '1qaz@WSXZx' };
+  const model = { password: '1qaz@WSXZx' };
+  const [passwordValid, setPasswordValid] = useState(true);
   const formInstance = useRef(null as any);
 
-  const createPasswordClick = () => {
+  const enterPasswordClick = () => {
     if (formInstance.current.instance.validate().isValid) {
-      formInstance.current.instance.resetValues();
-      dispatch(setInitialized(true));
-      const sampleData = Utils.getSampleData();
-      dispatch(set(sampleData));
-      dispatch(setAuthenticated(true));
-      navigate('contacts');
+      const data = window.electron.store.get('loadData').toString();
+      const contacts = Utils.decrypt(data, model.password);
+      if (contacts) {
+        formInstance.current.instance.resetValues();
+        dispatch(set(contacts));
+        dispatch(setAuthenticated(true));
+        setTimeout(() => navigate('contacts'));
+      } else {
+        setPasswordValid(false);
+        setTimeout(() => setPasswordValid(true), 1500);
+      }
     }
   };
 
@@ -57,12 +55,7 @@ export default function CreatePasswordPopup() {
       <BrandContainer>
         <Brand />
       </BrandContainer>
-      <h3>Please create a password</h3>
-      <p>
-        The data will be encrypted using this password. Please do not forget it,
-        as it is not stored anywhere and if it is lost, the data will be
-        impossible to recover.
-      </p>
+      <h3>Please enter a password</h3>
       <form action="your-action">
         <Form
           ref={formInstance}
@@ -83,22 +76,9 @@ export default function CreatePasswordPopup() {
               pattern={passwordRequirements.pattern}
               message={passwordRequirements.message}
             />
-          </SimpleItem>
-          <SimpleItem
-            editorType="dxTextBox"
-            dataField="confirm"
-            colSpan={2}
-            editorOptions={{ mode: 'password' }}
-          >
-            <Label text="Confirm Password" />
-            <RequiredRule message="Confirm Password is required" />
-            <PatternRule
-              pattern={passwordRequirements.pattern}
-              message={passwordRequirements.message}
-            />
-            <CompareRule
-              message="Password and Confirm Password do not match"
-              comparisonTarget={() => model.password}
+            <CustomRule
+              validationCallback={() => passwordValid}
+              message="The password you entered is wrong, please try again"
             />
           </SimpleItem>
         </Form>
@@ -118,10 +98,10 @@ export default function CreatePasswordPopup() {
         toolbar="bottom"
         location="after"
         options={{
-          text: 'Create password',
+          text: 'Enter password',
           type: 'success',
           validationGroup: 'passwordData',
-          onClick: () => createPasswordClick(),
+          onClick: () => enterPasswordClick(),
         }}
       />
     </Popup>

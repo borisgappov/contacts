@@ -1,3 +1,4 @@
+import 'crypto-js/core';
 import { render } from 'react-dom';
 import App from './App';
 

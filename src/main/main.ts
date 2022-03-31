@@ -20,6 +20,9 @@ ipcMain.on('electron-store-get', async (event, key) => {
     case 'sampleData':
       event.returnValue = sampleData.filter((e, i) => i < 15);
       break;
+    case 'loadData':
+      event.returnValue = DataSource.load();
+      break;
     default:
       event.returnValue = null;
   }
@@ -30,6 +33,9 @@ ipcMain.on('electron-store-set', async (event, key, val) => {
   switch (key) {
     case 'quit':
       app.quit();
+      break;
+    case 'saveData':
+      DataSource.save(val);
       break;
     default:
       break;
