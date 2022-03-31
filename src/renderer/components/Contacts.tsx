@@ -10,12 +10,16 @@ import DataGrid, {
   Popup,
   Form,
   ColumnChooser,
+  Toolbar,
+  SearchPanel,
 } from 'devextreme-react/data-grid';
 import { Item } from 'devextreme-react/form';
 import DataSource from 'devextreme/data/data_source';
 import ArrayStore from 'devextreme/data/array_store';
 import { IContact } from 'renderer/models/contact';
+import { Options } from 'devextreme-react/autocomplete';
 import { append, update, remove, selectItems } from '../store/contactsSlice';
+import Brand from './Brand';
 
 export default function Contacts() {
   const items = useSelector(selectItems);
@@ -69,6 +73,7 @@ export default function Contacts() {
       <HeaderFilter visible />
       <Scrolling mode="infinite" />
       <ColumnChooser enabled />
+      <SearchPanel visible />
 
       <Editing mode="popup" allowUpdating allowAdding allowDeleting>
         <Popup title="Edit or Add Contact" showTitle width={400} height={525} />
@@ -82,11 +87,46 @@ export default function Contacts() {
         </Form>
       </Editing>
 
-      <Column dataField="id" width={70} />
-      <Column dataField="name" />
+      <Column dataField="name" minWidth={150} />
       <Column dataField="phone" />
       <Column dataField="email" />
       <Column dataField="address" />
+
+      <Toolbar>
+        <Item location="before">
+          <Brand />
+        </Item>
+        <Item
+          location="after"
+          name="addRowButton"
+          showText="inMenu"
+          locateInMenu="auto"
+        />
+        <Item location="after" name="searchPanel" locateInMenu="auto" />
+        <Item location="after" name="columnChooserButton" locateInMenu="auto" />
+        {/* <Item name="separator" /> */}
+        <Item
+          location="after"
+          showText="inMenu"
+          widget="dxButton"
+          locateInMenu="auto"
+        >
+          <Options
+            icon="import"
+            hint="Import sample data"
+            text="Import sample data"
+          />
+          {/* <Button icon="import" hint="Import sample data" text="Import sample data" /> */}
+        </Item>
+        <Item
+          location="after"
+          showText="inMenu"
+          widget="dxButton"
+          locateInMenu="auto"
+        >
+          <Options icon="clear" hint="Clear" text="Clear" />
+        </Item>
+      </Toolbar>
     </DataGrid>
   );
 }

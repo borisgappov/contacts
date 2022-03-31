@@ -8,6 +8,13 @@ import {
 } from 'devextreme-react/form';
 import { Position } from 'devextreme-react/popup';
 import { InitializedEvent } from 'devextreme/ui/form';
+import styled from 'styled-components';
+import Brand from './Brand';
+
+const BrandContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
 
 export default function CreatePasswordPopup(props: {
   visible: boolean;
@@ -39,15 +46,18 @@ export default function CreatePasswordPopup(props: {
   return (
     <Popup
       visible={visible}
-      showTitle
+      showTitle={false}
       dragEnabled={false}
       closeOnOutsideClick={false}
       showCloseButton={false}
-      title="Please create a password"
       width={400}
       height={340}
     >
       <Position at="center" my="center" of={window} />
+      <BrandContainer>
+        <Brand />
+      </BrandContainer>
+      <h3>Please create a password</h3>
       <p>
         The data will be encrypted using this password. Please do not forget it,
         as it is not stored anywhere and if it is lost, the data will be
