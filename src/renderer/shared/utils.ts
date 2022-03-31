@@ -47,13 +47,11 @@ export default class Utils {
         }
       }
       // eslint-disable-next-line
-    } catch (ex) {
-      console.log(ex);
-    }
+    } catch (ex) {}
     return contacts;
   }
 
-  static getHash = (str: string): string => CryptoJS.SHA256(str).toString();
+  static getHash = (str: string): string => CryptoJS.SHA1(str).toString();
 
   static getNextId = (items: IContact[]): number =>
     items.reduce((p: IContact, c: IContact) => (p.id > c.id ? p : c), {

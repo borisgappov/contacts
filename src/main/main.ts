@@ -11,14 +11,11 @@ import sampleData from './sample-data.json';
 
 ipcMain.on('electron-store-get', async (event, key) => {
   switch (key) {
-    case 'contacts':
-      event.returnValue = [1, 2, 3, 4, 5];
-      break;
     case 'isInitialized':
       event.returnValue = DataSource.dataFileExist();
       break;
     case 'sampleData':
-      event.returnValue = sampleData.filter((e, i) => i < 15);
+      event.returnValue = sampleData.splice(0, 150);
       break;
     case 'loadData':
       event.returnValue = DataSource.load();

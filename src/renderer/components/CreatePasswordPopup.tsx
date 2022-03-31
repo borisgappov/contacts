@@ -24,13 +24,13 @@ export default function CreatePasswordPopup() {
   const dispatch = useDispatch();
   const passwordRequirements = Utils.getPasswordRequirements();
   const model = { password: '1qaz@WSXZx', confirm: '1qaz@WSXZx' };
-  const formInstance: React.RefObject<Form> = useRef(null);
+  const formRef: React.RefObject<Form> = useRef(null);
 
   const createPasswordClick = () => {
-    if (formInstance.current?.instance.validate().isValid) {
+    if (formRef.current?.instance.validate().isValid) {
       const items = Utils.getSampleData();
       const hash = Utils.getHash(model.password);
-      formInstance.current.instance.resetValues();
+      formRef.current.instance.resetValues();
       dispatch(set(items));
       dispatch(setInitialized(true));
       dispatch(setHash(hash));
@@ -60,7 +60,7 @@ export default function CreatePasswordPopup() {
       </p>
       <form action="your-action">
         <Form
-          ref={formInstance}
+          ref={formRef}
           formData={model}
           readOnly={false}
           validationGroup="passwordData"

@@ -6,4 +6,5 @@ body {
 
 #root {
   height: calc(100vh - 40px);
+  display: flex;
 }
