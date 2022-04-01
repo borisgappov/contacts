@@ -115,4 +115,4 @@ dist
 
 # TernJS port file
 .tern-port
-/src/main/rdxworks_contacts.data
+/src/main/contacts.data

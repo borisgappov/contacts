@@ -1,15 +1,20 @@
+/* eslint promise/catch-or-return: off, promise/always-return: off */
 import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'devextreme-react';
+import { Options } from 'devextreme-react/autocomplete';
 import DataGrid, {
   Column,
   ColumnChooser,
   Editing,
+  EmailRule,
   FilterBuilderPopup,
   FilterPanel,
   FilterRow,
   Form,
   HeaderFilter,
+  Pager,
+  Paging,
   Popup,
   SearchPanel,
   Toolbar,
@@ -20,8 +25,10 @@ import DataSource from 'devextreme/data/data_source';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Encryptor from 'renderer/shared/encryptor';
 import Utils from 'renderer/shared/utils';
 import styled from 'styled-components';
+import { confirm } from 'devextreme/ui/dialog';
 import {
   append,
   remove,
@@ -29,6 +36,7 @@ import {
   selectItems,
   set,
   setHash,
+  setInitialized,
   update,
 } from '../store/contactsSlice';
 import Brand from './Brand';
@@ -44,13 +52,49 @@ export default function Contacts() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (hash) window.electron.store.set('saveData', Utils.encrypt(items, hash));
+    if (hash)
+      window.electron.data.set('saveData', Encryptor.encrypt(items, hash));
   }, [hash, items]);
 
   const logOut = () => {
     dispatch(setHash(''));
     dispatch(set([]));
     navigate('/');
+  };
+
+  const importData = () => {
+    confirm(
+      'All data will be replaced with test data. Are you sure you want to import test data?',
+      'Please confirm'
+    ).then((result) => {
+      if (result) {
+        dispatch(set(Utils.getSampleData()));
+      }
+    });
+  };
+
+  const reset = () => {
+    confirm(
+      'All data will be deleted and the application will return to its initial state. Are you sure you want to reset?',
+      'Please confirm'
+    ).then((result) => {
+      if (result) {
+        window.electron.data.set('reset', null);
+        dispatch(setInitialized(false));
+        logOut();
+      }
+    });
+  };
+
+  const clear = () => {
+    confirm(
+      'All data will be deleted. Are you sure you want to clear?',
+      'Please confirm'
+    ).then((result) => {
+      if (result) {
+        dispatch(set([]));
+      }
+    });
   };
 
   const dataSource = new DataSource({
@@ -85,6 +129,14 @@ export default function Contacts() {
       <HeaderFilter visible />
       <ColumnChooser enabled />
       <SearchPanel visible />
+      <Paging defaultPageSize={15} />
+      <Pager
+        visible
+        allowedPageSizes
+        showPageSizeSelector
+        showInfo
+        showNavigationButtons
+      />
 
       <Editing mode="popup" allowUpdating allowAdding allowDeleting>
         <Popup showTitle width={500} height={460} />
@@ -98,6 +150,7 @@ export default function Contacts() {
             </Item>
             <Item dataField="email" editorOptions={{ mode: 'email' }}>
               <RequiredRule message="Email is required" />
+              <EmailRule />
             </Item>
             <Item
               dataField="address"
@@ -124,6 +177,31 @@ export default function Contacts() {
           <Button width={36} height={36} hint="Log Out" onClick={logOut}>
             <FaIcon icon={faArrowRightFromBracket} />
           </Button>
+        </Item>
+
+        <Item
+          location="after"
+          widget="dxButton"
+          locateInMenu="always"
+          onClick={importData}
+        >
+          <Options icon="import" text="Import sample data" />
+        </Item>
+        <Item
+          location="after"
+          widget="dxButton"
+          locateInMenu="always"
+          onClick={clear}
+        >
+          <Options icon="trash" text="Clear data" />
+        </Item>
+        <Item
+          location="after"
+          widget="dxButton"
+          locateInMenu="always"
+          onClick={reset}
+        >
+          <Options icon="remove" text="Reset" />
         </Item>
       </Toolbar>
     </DataGrid>

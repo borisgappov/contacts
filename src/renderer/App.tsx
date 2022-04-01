@@ -9,7 +9,7 @@ import './styles.css';
 
 function AppRouter() {
   const dispatch = useDispatch();
-  dispatch(setInitialized(window.electron.store.get('isInitialized')));
+  dispatch(setInitialized(window.electron.data.get('isInitialized')));
 
   return (
     <Router>

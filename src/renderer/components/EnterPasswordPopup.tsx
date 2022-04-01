@@ -1,33 +1,25 @@
 import { Form, Popup } from 'devextreme-react';
 import { ToolbarItem } from 'devextreme-react/autocomplete';
-import { PatternRule } from 'devextreme-react/data-grid';
 import { RequiredRule, SimpleItem } from 'devextreme-react/form';
 import { Position } from 'devextreme-react/popup';
 import { CustomRule } from 'devextreme-react/validator';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import Utils from 'renderer/shared/utils';
+import Encryptor from 'renderer/shared/encryptor';
 import { set, setHash } from 'renderer/store/contactsSlice';
-import styled from 'styled-components';
 import Brand from './Brand';
-
-const BrandContainer = styled.div`
-  display: flex;
-  justify-content: center;
-`;
 
 export default function EnterPasswordPopup() {
   const dispatch = useDispatch();
-  const passwordRequirements = Utils.getPasswordRequirements();
-  const model = { password: '1qaz@WSXZx' };
+  const model = { password: '' };
   const [passwordValid, setPasswordValid] = useState(true);
   const formInstance: React.RefObject<Form> = useRef(null);
 
   const enterPasswordClick = () => {
     if (formInstance.current?.instance.validate().isValid) {
-      const data = window.electron.store.get('loadData').toString();
-      const hash = Utils.getHash(model.password);
-      const contacts = Utils.decrypt(data, hash);
+      const data = window.electron.data.get('loadData').toString();
+      const hash = Encryptor.getHash(model.password);
+      const contacts = Encryptor.decrypt(data, hash);
       if (contacts) {
         formInstance.current.instance.resetValues();
         dispatch(set(contacts));
@@ -49,37 +41,32 @@ export default function EnterPasswordPopup() {
       height={230}
     >
       <Position at="center" my="center" of={window} />
-      <BrandContainer>
-        <Brand />
-      </BrandContainer>
+      <Brand />
       <h3>Please enter a password</h3>
-      <form action="your-action">
-        <Form
-          ref={formInstance}
-          formData={model}
-          readOnly={false}
-          validationGroup="passwordData"
-          colCount={2}
-          showValidationSummary
+      <Form
+        ref={formInstance}
+        formData={model}
+        readOnly={false}
+        validationGroup="passwordData"
+        showValidationSummary
+      >
+        <SimpleItem
+          editorType="dxTextBox"
+          dataField="password"
+          editorOptions={{
+            mode: 'password',
+            onEnterKey: () => enterPasswordClick(),
+            onKeyDown: () => setPasswordValid(true),
+            onInitialized: (e: any) =>
+              setTimeout(() => e.component.focus(), 500),
+          }}
         >
-          <SimpleItem
-            editorType="dxTextBox"
-            dataField="password"
-            colSpan={2}
-            editorOptions={{ mode: 'password' }}
-          >
-            <RequiredRule message="Password is required" />
-            <PatternRule
-              pattern={passwordRequirements.pattern}
-              message={passwordRequirements.message}
-            />
-            <CustomRule
-              validationCallback={() => passwordValid}
-              message="The password you entered is wrong, please try again"
-            />
-          </SimpleItem>
-        </Form>
-      </form>
+          <CustomRule
+            validationCallback={() => passwordValid}
+            message="The password you entered is wrong, please try again"
+          />
+        </SimpleItem>
+      </Form>
       <ToolbarItem
         widget="dxButton"
         toolbar="bottom"
@@ -87,7 +74,7 @@ export default function EnterPasswordPopup() {
         options={{
           horizontalAlignment: 'left',
           text: 'Exit',
-          onClick: () => window.electron.store.set('quit', null),
+          onClick: () => window.electron.data.set('quit', null),
         }}
       />
       <ToolbarItem

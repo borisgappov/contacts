@@ -1,18 +1,11 @@
 declare global {
   interface Window {
     electron: {
-      store: {
+      data: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         get: (key: string) => any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         set: (key: string, val: any) => void;
-      };
-      ipcRenderer: {
-        myPing(): void;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        on(channel: string, func: (...args: any[]) => void): void;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        once(channel: string, func: (...args: any[]) => void): void;
       };
     };
   }

@@ -8,17 +8,21 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import DataSource from './data-source';
 import sampleData from './sample-data.json';
+import PreferencesManager from './preferences-manager';
 
-ipcMain.on('electron-store-get', async (event, key) => {
+ipcMain.on('electron-data-get', async (event, key) => {
   switch (key) {
     case 'isInitialized':
       event.returnValue = DataSource.dataFileExist();
       break;
     case 'sampleData':
-      event.returnValue = sampleData.splice(0, 150);
+      event.returnValue = sampleData;
       break;
     case 'loadData':
-      event.returnValue = DataSource.load();
+      event.returnValue = await DataSource.load();
+      break;
+    case 'loadPreferences':
+      event.returnValue = await PreferencesManager.load();
       break;
     default:
       event.returnValue = null;
@@ -26,13 +30,19 @@ ipcMain.on('electron-store-get', async (event, key) => {
 });
 
 // eslint-disable-next-line
-ipcMain.on('electron-store-set', async (event, key, val) => {
+ipcMain.on('electron-data-set', async (event, key, val) => {
   switch (key) {
     case 'quit':
       app.quit();
       break;
     case 'saveData':
-      DataSource.save(val);
+      await DataSource.save(val);
+      break;
+    case 'reset':
+      DataSource.removeDataFile();
+      break;
+    case 'savePreferences':
+      await PreferencesManager.save(val);
       break;
     default:
       break;
