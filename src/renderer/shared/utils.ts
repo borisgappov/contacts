@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint promise/catch-or-return: off, promise/always-return: off, no-return-assign: off */
+import dxButton from 'devextreme/ui/button';
+import { custom, CustomDialogOptions } from 'devextreme/ui/dialog';
 import { IContact } from 'renderer/models/contact';
-import { custom } from 'devextreme/ui/dialog';
 
 export default class Utils {
   static getSampleData(): IContact[] {
@@ -26,34 +29,33 @@ export default class Utils {
       id: 0,
     } as IContact).id + 1;
 
-  // static confirm = (title: string, message: string, ) => custom({
-  //   title: "Confirm?",
-  //   messageHtml: "Save",
-  //   buttons: [{
-  //     text: "Yes",
-  //     onClick: () => true,
-  //     onContentReady: function(e: any) {
-  //       e.element[0].onkeydown = function(e) {
-  //         if(e.keyCode == 39) //right arrow
-  //           $(".dx-dialog-button")[1].focus(); //set focus to "No" button
-  //         else if(e.keyCode == 13)
-  //           return "Confirmed"
-  //       }
-  //     }
-  //   }, {
-  //     text: "No",
-  //     onClick: function(e) {
-  //       return "Cancelled"
-  //     },
-  //     onContentReady: function(e) {
-  //       e.element[0].onkeydown = function(e) {
-  //         if(e.keyCode == 37) //left arrow
-  //           $(".dx-dialog-button")[0].focus(); //set focus to "Yes" button
-  //         else if(e.keyCode == 13)
-  //           return "Cancelled"
-  //       }
-  //     }
-  //   }],
-
-  // });
+  static confirm = (
+    messageHtml: string,
+    title = 'Please confirm'
+  ): Promise<boolean> => {
+    return new Promise((resolve) => {
+      let leftButton: dxButton | undefined;
+      let rightButton: dxButton | undefined;
+      custom({
+        title,
+        messageHtml,
+        showTitle: true,
+        dragEnabled: false,
+        buttons: [
+          {
+            text: 'Yes',
+            onClick: () => resolve(true),
+            onInitialized: (e: any) => (leftButton = e.component?.instance()),
+            onKeyDown: (e: any) => e.keyCode === 39 && rightButton?.focus(),
+          },
+          {
+            text: 'No',
+            onClick: () => resolve(false),
+            onInitialized: (e: any) => (rightButton = e.component?.instance()),
+            onKeyDown: (e: any) => e.keyCode === 37 && leftButton?.focus(),
+          },
+        ],
+      } as unknown as CustomDialogOptions).show();
+    });
+  };
 }

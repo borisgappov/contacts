@@ -23,56 +23,58 @@ import { Item, RequiredRule } from 'devextreme-react/form';
 import ArrayStore from 'devextreme/data/array_store';
 import DataSource from 'devextreme/data/data_source';
 import { useEffect, useRef } from 'react';
+import { renderToString } from 'react-dom/server';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Encryptor from 'renderer/shared/encryptor';
 import Utils from 'renderer/shared/utils';
-import styled from 'styled-components';
-import { confirm } from 'devextreme/ui/dialog';
 import {
   append,
   remove,
+  selectAuthenticated,
   selectHash,
   selectItems,
-  set,
+  setData,
   setHash,
   setInitialized,
   update,
 } from '../store/contactsSlice';
 import Brand from './Brand';
+import Message from './Message';
 
 export default function Contacts() {
   const items = useSelector(selectItems);
   const hash = useSelector(selectHash);
+  const authenticated = useSelector(selectAuthenticated);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (hash)
+    if (authenticated) {
       window.electron.data.set('saveData', Encryptor.encrypt(items, hash));
-  }, [hash, items]);
+    }
+  }, [authenticated, hash, items]);
 
   const logOut = () => {
     dispatch(setHash(''));
-    dispatch(set([]));
+    dispatch(setData([]));
     navigate('/');
   };
 
+  const confirm = (text: string): Promise<boolean> =>
+    Utils.confirm(renderToString(<Message text={text} />));
+
   const importData = () => {
-    confirm(
-      'All data will be replaced with test data. Are you sure you want to import test data?',
-      'Please confirm'
-    ).then((result) => {
-      if (result) {
-        dispatch(set(Utils.getSampleData()));
-      }
-    });
+    confirm(`All data will be replaced with test data.
+        Are you sure you want to import test data?`).then(
+      (result) => result && dispatch(setData(Utils.getSampleData()))
+    );
   };
 
   const reset = () => {
     confirm(
-      'All data will be deleted and the application will return to its initial state. Are you sure you want to reset?',
-      'Please confirm'
+      `All data will be deleted and the application will return to its initial state.
+      Are you sure you want to reset?`
     ).then((result) => {
       if (result) {
         window.electron.data.set('reset', null);
@@ -83,14 +85,9 @@ export default function Contacts() {
   };
 
   const clear = () => {
-    confirm(
-      'All data will be deleted. Are you sure you want to clear?',
-      'Please confirm'
-    ).then((result) => {
-      if (result) {
-        dispatch(set([]));
-      }
-    });
+    confirm('All data will be deleted. Are you sure you want to clear?').then(
+      (result) => result && dispatch(setData([]))
+    );
   };
 
   const dataSource = new DataSource({

@@ -12,7 +12,7 @@ export const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
   reducers: {
-    set: (state, action) => {
+    setData: (state, action) => {
       state.items = action.payload;
     },
     append: (state, action) => {
@@ -39,7 +39,7 @@ export const contactsSlice = createSlice({
   },
 });
 
-export const { append, remove, set, update, setInitialized, setHash } =
+export const { setData, append, remove, update, setInitialized, setHash } =
   contactsSlice.actions;
 
 export const selectItems = (state: { contacts: IContactsState }) =>

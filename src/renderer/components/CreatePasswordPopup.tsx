@@ -14,11 +14,12 @@ import { useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import Encryptor from 'renderer/shared/encryptor';
 import Utils from 'renderer/shared/utils';
-import { set, setHash, setInitialized } from 'renderer/store/contactsSlice';
-import { confirm } from 'devextreme/ui/dialog';
+import { setData, setHash, setInitialized } from 'renderer/store/contactsSlice';
 import { IPreferences } from 'common/preferences';
 import validationEngine from 'devextreme/ui/validation_engine';
+import { renderToString } from 'react-dom/server';
 import Brand from './Brand';
+import Message from './Message';
 
 export default function CreatePasswordPopup() {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export default function CreatePasswordPopup() {
 
   const loadTestData = () => {
     const items = Utils.getSampleData();
-    dispatch(set(items));
+    dispatch(setData(items));
     window.electron.data.set('saveData', Encryptor.encrypt(items, hash));
   };
 
@@ -48,21 +49,21 @@ export default function CreatePasswordPopup() {
           loadTestData();
         }
       } else {
-        confirm('Would you like to load test data?', 'Just a question').then(
-          (result) => {
-            preferences = {} as IPreferences;
-            if (result) {
-              loadTestData();
-              preferences.needTestData = true;
-            } else {
-              preferences.needTestData = false;
-            }
-            window.electron.data.set(
-              'savePreferences',
-              JSON.stringify(preferences)
-            );
+        Utils.confirm(
+          renderToString(<Message text="Would you like to load test data?" />)
+        ).then((result) => {
+          preferences = {} as IPreferences;
+          if (result) {
+            loadTestData();
+            preferences.needTestData = true;
+          } else {
+            preferences.needTestData = false;
           }
-        );
+          window.electron.data.set(
+            'savePreferences',
+            JSON.stringify(preferences)
+          );
+        });
       }
     }
   };
@@ -100,8 +101,10 @@ export default function CreatePasswordPopup() {
           editorOptions={{
             mode: 'password',
             onEnterKey: () => createPasswordClick(),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onKeyDown: (e: any) =>
               e.component.option('validationStatus', 'valid'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onInitialized: (e: any) =>
               setTimeout(() => e.component.focus(), 500),
           }}
@@ -119,6 +122,7 @@ export default function CreatePasswordPopup() {
           editorOptions={{
             mode: 'password',
             onEnterKey: () => createPasswordClick(),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onKeyDown: (e: any) =>
               e.component.option('validationStatus', 'valid'),
           }}
