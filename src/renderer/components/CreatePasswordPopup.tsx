@@ -17,6 +17,7 @@ import Utils from 'renderer/shared/utils';
 import { set, setHash, setInitialized } from 'renderer/store/contactsSlice';
 import { confirm } from 'devextreme/ui/dialog';
 import { IPreferences } from 'common/preferences';
+import validationEngine from 'devextreme/ui/validation_engine';
 import Brand from './Brand';
 
 export default function CreatePasswordPopup() {
@@ -36,7 +37,7 @@ export default function CreatePasswordPopup() {
   const createPasswordClick = () => {
     if (formRef.current?.instance.validate().isValid) {
       hash = Encryptor.getHash(model.password);
-      formRef.current.instance.resetValues();
+      validationEngine.resetGroup('passwordData');
       dispatch(setInitialized(true));
       dispatch(setHash(hash));
 
@@ -91,7 +92,6 @@ export default function CreatePasswordPopup() {
         readOnly={false}
         validationGroup="passwordData"
         colCount={2}
-        showValidationSummary
       >
         <SimpleItem
           editorType="dxTextBox"
@@ -100,6 +100,8 @@ export default function CreatePasswordPopup() {
           editorOptions={{
             mode: 'password',
             onEnterKey: () => createPasswordClick(),
+            onKeyDown: (e: any) =>
+              e.component.option('validationStatus', 'valid'),
             onInitialized: (e: any) =>
               setTimeout(() => e.component.focus(), 500),
           }}
@@ -117,6 +119,8 @@ export default function CreatePasswordPopup() {
           editorOptions={{
             mode: 'password',
             onEnterKey: () => createPasswordClick(),
+            onKeyDown: (e: any) =>
+              e.component.option('validationStatus', 'valid'),
           }}
         >
           <Label text="Confirm Password" />

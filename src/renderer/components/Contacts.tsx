@@ -41,10 +41,6 @@ import {
 } from '../store/contactsSlice';
 import Brand from './Brand';
 
-const FaIcon = styled(FontAwesomeIcon)`
-  font-size: 18px;
-`;
-
 export default function Contacts() {
   const items = useSelector(selectItems);
   const hash = useSelector(selectHash);
@@ -175,7 +171,10 @@ export default function Contacts() {
         <Item location="after" name="columnChooserButton" locateInMenu="auto" />
         <Item location="after">
           <Button width={36} height={36} hint="Log Out" onClick={logOut}>
-            <FaIcon icon={faArrowRightFromBracket} />
+            <FontAwesomeIcon
+              icon={faArrowRightFromBracket}
+              style={{ fontSize: 18 }}
+            />
           </Button>
         </Item>
 

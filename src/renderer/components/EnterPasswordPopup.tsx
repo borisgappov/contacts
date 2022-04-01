@@ -1,6 +1,6 @@
 import { Form, Popup } from 'devextreme-react';
 import { ToolbarItem } from 'devextreme-react/autocomplete';
-import { RequiredRule, SimpleItem } from 'devextreme-react/form';
+import { SimpleItem } from 'devextreme-react/form';
 import { Position } from 'devextreme-react/popup';
 import { CustomRule } from 'devextreme-react/validator';
 import { useRef, useState } from 'react';
@@ -48,7 +48,6 @@ export default function EnterPasswordPopup() {
         formData={model}
         readOnly={false}
         validationGroup="passwordData"
-        showValidationSummary
       >
         <SimpleItem
           editorType="dxTextBox"
@@ -56,7 +55,8 @@ export default function EnterPasswordPopup() {
           editorOptions={{
             mode: 'password',
             onEnterKey: () => enterPasswordClick(),
-            onKeyDown: () => setPasswordValid(true),
+            onKeyDown: (e: any) =>
+              e.component.option('validationStatus', 'valid'),
             onInitialized: (e: any) =>
               setTimeout(() => e.component.focus(), 500),
           }}
