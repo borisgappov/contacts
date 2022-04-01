@@ -18,7 +18,7 @@
 
 ### Build:
 
-`npm run buils`
+`npm run build`
 
 ### Make installer:
 
